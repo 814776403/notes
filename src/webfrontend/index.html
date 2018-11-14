@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>考试</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="form-control">
+        <div class="form-group">
+            <label for="title">标题：</label>
+            <input id="title" type="text" placeholder="车名模糊查询" class="form-control" />
+        </div>
+
+
+        <div class="form-group">
+            <label for="beginDate">日期：</label>
+            <input id="beginDate" type="date" placeholder="开始日期" class="form-control" />
+            <input id="endDate" type="date" placeholder="结束日期" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-outline-primary" onclick="loadQuery()">查询</button>
+            <button class="btn btn-outline-primary" onclick="add()">新增</button>
+        </div>
+    </div>
+
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <td>编号</td>
+            <td>标题</td>
+            <td>内容</td>
+            <td>销售日期</td>
+            <td>操作</td>
+        </tr>
+        </thead>
+        <tfoot>
+
+        </tfoot>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<script src="js/jquery/1.9.1/jquery.min.js"></script>
+<script>
+
+    $(window).on("load",function () {
+        //查询
+        loadQuery();
+    })
+
+    //查询
+    function loadQuery() {
+
+        $.ajax({
+            url:"http://127.0.0.1:8086/api/sel",
+            type:"get",
+            data:{"title":$("#title").val(),
+                "beginDate":$("#beginDate").val(),
+                "endDate":$("#endDate").val(),
+            },
+            dataType:"json",
+            xhrFields:{
+                withCredentials:true
+            },
+            success:function (data) {
+                console.log(data);
+                if(!data){ //判断诗句是否为空
+                    $("tbody").html("<tr><td colspan='5'>无数据</td></tr>")
+                }else{
+                    var appendVal = '';
+                    $.each(data,function (index,not) {
+                        appendVal +=`
+                           <tr id="${not.id}">
+                                <td>${not.id}</td>
+                                <td>${not.title}</td>
+                                <td>${not.content}</td>
+                                <td>${not.time}</td>
+                                <td>
+                                 <button class="btn btn-outline-danger" onclick="del(${not.id})">删除</button>
+                                 <button class="btn btn-outline-info" onclick="upd(${not.id})">修改</button>
+                                 </td>
+                            </tr>
+                         `;
+                    })
+                    $("tbody").html(appendVal);
+
+
+                }
+
+            }
+        })
+
+    }
+
+    //删除
+    function del(id) {
+        if(window.confirm("是否确认删除")){
+            $.ajax({
+                url:"http://127.0.0.1:8086/api/del/",
+                type:"get",
+                data:{"id":id},
+                xhrFields:{
+                    withCredentials:true
+                },
+                success:function (data) {
+                    if(data==1){
+                        //loadQuery();
+                       location.href="index.html";
+                    }
+                }
+            })
+        }
+    }
+
+    //新增
+    function add() {
+        localStorage.removeItem("id");
+        location.href="insert.html";
+    }
+    //新增
+    function upd(id) {
+        localStorage.setItem("id",id);
+        location.href="insert.html";
+    }
+
+</script>
+</body>
+</html>

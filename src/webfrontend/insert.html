@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增或者修改</title>
+</head>
+<body>
+<input type="text" id="title">
+<input type="text" id="content">
+<input type="text" id="time">
+<input type="submit"  onclick="addOrUpd()">提交</input>
+
+<script src="js/jquery/1.9.1/jquery.min.js"></script>
+<script>
+    $(window).on("load",function () {
+        var id=localStorage.getItem("id");
+        if(id!=0){
+            byid(id);
+        }
+
+    })
+
+
+
+
+   function addOrUpd(id){
+       var id=localStorage.getItem("id");
+       if(id==null){
+           id=0;
+       }
+         $.ajax({
+             url:"http://127.0.0.1:8086/api/ins/",
+             type:"get",
+             data:{"title":$("#title").val(),
+                 "content":$("#content").val(),
+                 "time":$("#time").val(),
+                 "id":id
+             },
+             dataType:"json",
+             xhrFields:{
+                 withCredentials:true
+             },
+             success:function (data){
+                 window.location.href="index.html";             }
+             })
+
+      }
+
+      function byid(id){
+          $.ajax({
+              url:"http://127.0.0.1:8086/api/upd/",
+              type:"get",
+              data:{"id":id},
+              dataType:"json",
+              xhrFields:{
+                  withCredentials:true
+              },
+              success:function (data){
+                  if(data){
+                      $("#title").val(data.title);
+                      $("#content").val(data.content);
+                      $("#time").val(data.time);
+                  }
+              }
+          })
+      }
+
+
+</script>
+</body>
+</html>
